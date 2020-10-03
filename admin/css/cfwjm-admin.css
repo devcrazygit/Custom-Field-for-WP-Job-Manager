@@ -1,0 +1,29 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+#col-left {
+    float: left;
+    width: 35%;
+}
+#col-right{
+    float: right;
+    width: 65%;
+}
+
+.bootstrap-tagsinput{
+    width: 95%;
+}
+.label-info {
+    background-color: #5bc0de;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
