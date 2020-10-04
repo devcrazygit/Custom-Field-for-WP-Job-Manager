@@ -31,7 +31,8 @@
 	$(function(){
 		let tag_type_tag = $("select[name='tag-type']");
 		let meta_tag = $(".form-field.type_meta");
-	
+
+		tag_type_tag.val(tag_type_tag.data('value'));
 		tag_type_tag.on("change", function(){
 			let type = tag_type_tag.val()
 			if(type === "date" || type === "text"){
@@ -40,6 +41,24 @@
 			}
 			meta_tag.show();		
 		})
+		let type = tag_type_tag.val()
+		if(type === "date" || type === "text"){
+			meta_tag.hide();
+		}else{
+			meta_tag.show();
+		}
+
+		let meta_input = $("select[name='tag-meta']");
+		let meta_value = meta_input.val();
+		meta_input.tagsinput('add', meta_input);
+
+		let priority_tag = $("select[name='tag-priority']");
+		priority_tag.val(priority_tag.data('value'));
+
+		let required_tag = $("select[name='tag-required']");
+		required_tag.val(required_tag.data('value'));
+
+
 	});
 	
 })( jQuery );

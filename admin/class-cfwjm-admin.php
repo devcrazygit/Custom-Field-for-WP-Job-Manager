@@ -22,6 +22,8 @@
  */
 class Cfwjm_Admin {
 
+	const PLUGIN_SLUG = "edit.php?post_type=job_listing";
+
 	/**
 	 * The ID of this plugin.
 	 *
@@ -46,6 +48,8 @@ class Cfwjm_Admin {
 
 	private $menu_prefix = "cfjm_menu_";
 
+	private $backlink_page = "";
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -60,6 +64,7 @@ class Cfwjm_Admin {
 
 		include_once CFWJM_LIB_PATH . "\\class-cfwjm-list-table.php";
 		include_once CFWJM_INCLUDE_PATH . "\\class-cfwjm-loader.php";
+		$this->backlink_page = self::PLUGIN_SLUG . '&page=cfjm_menu_add_field';
 	}
 
 	/**
@@ -120,7 +125,7 @@ class Cfwjm_Admin {
 		// 	[$this, 'menu_add_field']
 		// );
 		$hook_suffix = add_submenu_page(
-			'edit.php?post_type=job_listing',
+			self::PLUGIN_SLUG,
 			__('Job Manager Custom Fields', $this->plugin_name),
 			__('Job Manager Custom Fields', $this->plugin_name),
 			'manage_options',
@@ -158,7 +163,55 @@ class Cfwjm_Admin {
 
 	public function cfwjm_fields_form(){
 		if(current_user_can('administrator')){
+			$action = 'cfwjm_add_field';
+			$nounce_name = "cfwjm_add_message";
+			$val = [];
+			$val['field_key'] = '';
+			$val['label'] = "";
+			$val['type'] = 'text';
+			$val['meta_1'] = '';
+			$val['placeholder'] = '';
+			$val['priority'] = 10;
+			$val['required'] = 0;
+			$val['description'] = '';
+			$val['cfwjm_tag'] = 'cfwjm_tag';
+			
 			include_once 'partials/cfwjm-admin-add-form.php';
+		}
+	}
+	public function cfwjm_fields_edit_form(){
+		if(current_user_can('administrator')){
+			$action = 'cfwjm_edit_field';
+			$nounce_name = "cfwjm_edit_message";			
+			$id = $_REQUEST['id'];
+			$val = Cfwjm_Db::get($id);
+			if(empty($val)){
+				wp_die(__("No such a field", $this->plugin_name));
+			}			
+			include_once 'partials/cfwjm-admin-add-form.php';
+		}
+	}
+	public function cfwjm_edit_field(){
+		if ( ! isset( $_POST['cfwjm_edit_message'] ) 
+			|| ! wp_verify_nonce( $_POST['cfwjm_edit_message'], 'cfwjm_edit_field') || empty($_REQUEST['id'])){
+			wp_die( 
+				__( 'Invalid nonce specified', $this->plugin_name ),
+				__( 'Error', $this->plugin_name ), [
+					'response' 	=> 403,
+					'back_link' => $this->backlink_page
+				]);
+		}else{
+			$data = $this->validate();
+			if(empty($data)){
+				return;
+			}
+			$id = $_REQUEST['id'];
+			$res = Cfwjm_Db::updateField($data, $id);
+			if($res === false){
+				$_SESSION['cfwjm_msg'] = $this->error_notice(__("Update failed", $this->plugin_name));
+			}
+			$_SESSION['cfwjm_msg'] = $this->success_notice(__("Successfully updated", $this->plugin_name));
+			wp_redirect($this->backlink_page);
 		}
 	}
 
@@ -172,43 +225,28 @@ class Cfwjm_Admin {
 				__( 'Invalid nonce specified', $this->plugin_name ),
 				__( 'Error', $this->plugin_name ), [
 					'response' 	=> 403,
-					'back_link' => 'admin.php?page=' . $this->plugin_name
+					'back_link' => $this->backlink_page
 				]);
 		} else {
-			$data = $this->post_data();
-			if(empty($data['label'])){
-				$error_msg = sprintf(__("%s is required", $this->plugin_name), __("Label", $this->plugin_name));
-				$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
-				wp_redirect($_POST['_wp_http_referer']);
+			$data = $this->validate();
+			if(empty($data)){
 				return;
 			}
-			if(empty($data['type'])){
-				$error_msg = sprintf(__("%s is required", $this->plugin_name), __("Type", $this->plugin_name));
-				$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
-				wp_redirect($_POST['_wp_http_referer']);
-				return;
-			}
-			if($data['type'] === 'radio' || $data['type'] === 'select'){
-				if(empty($data['meta_1'])){					
-					$error_msg = sprintf(__("%s must be specified.", $this->plugin_name), __("Items", $this->plugin_name));					
-					$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);					
-					wp_redirect($_POST['_wp_http_referer']); 
-					return;
-				}
-			}
+			
 			$res = Cfwjm_Db::insertField($data);
-			if(empty($res)){
+			if($res === false){
 				$error_msg = __("Db insert failed", $this->plugin_name);
 				$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
-				wp_redirect($_POST['_wp_http_referer']);
+				wp_redirect($this->backlink_page);
 				return;
 			}
 			$_SESSION['cfwjm_msg'] = $this->success_notice();
-			wp_redirect($_POST['_wp_http_referer']);
+			wp_redirect($this->backlink_page);
 		}
 	}
 	public function post_data(){
 		$data = [];
+		$data['field_key'] = empty($_POST['tag-field-key']) ? null : $_POST['tag-field-key'];
 		$data['label'] = empty($_POST['tag-label']) ? null : $_POST['tag-label'];
 		$data['type'] = empty($_POST['tag-type']) ? null : $_POST['tag-type'];
 		if($data['type'] === 'radio' || $data['type'] === 'select'){
@@ -219,11 +257,53 @@ class Cfwjm_Admin {
 		$data['required'] = empty($_POST['tag-required']) ? 0 : $_POST['tag-required'];
 		$data['description'] = empty($_POST['tag-description']) ? '' : $_POST['tag-description'];
 		$data['cfwjm_tag'] = empty($_POST['tag-cfwjm-tag']) ? 'cfwjm_tag' : $_POST['tag-cfwjm-tag'];
+		
 		return $data;
 	}
 
-	public function success_notice(){
-		$msg = __('Add field success', $this->plugin_name);
+	public function validate(){
+		$data = $this->post_data();
+		if(empty($data['label'])){
+			$error_msg = sprintf(__("%s is required", $this->plugin_name), __("Label", $this->plugin_name));
+			$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
+			wp_redirect($this->backlink_page);
+			return null;
+		}
+		if(empty($data['field_key'])){
+			$error_msg = sprintf(__("%s is required", $this->plugin_name), __("Key", $this->plugin_name));
+			$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
+			wp_redirect($this->backlink_page);
+			return null;
+		}
+		if(empty($data['type'])){
+			$error_msg = sprintf(__("%s is required", $this->plugin_name), __("Type", $this->plugin_name));
+			$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
+			wp_redirect($this->backlink_page);
+			return null;
+		}
+		if($data['type'] === 'radio' || $data['type'] === 'select'){
+			if(empty($data['meta_1'])){					
+				$error_msg = sprintf(__("%s must be specified.", $this->plugin_name), __("Items", $this->plugin_name));					
+				$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);					
+				wp_redirect($this->backlink_page); 
+				return null;
+			}
+		}
+		$existing = Cfwjm_Db::getWhere(['label' => $data['label'], 'field_key' => $data['field_key']], "or");
+		$id = isset($_REQUEST['id']) ? $_REQUEST['id'] : -1;			
+		if(!empty($existing) && $existing['id'] != $id){			
+			$error_msg = __("Label and Key Name must be unique", $this->plugin_name);
+			$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
+			wp_redirect($this->backlink_page);
+			return null;
+		}
+		return $data;
+	}
+
+	public function success_notice($msg = null){
+		if(empty($msg)){
+			$msg = __('Add field success', $this->plugin_name);
+		}
 		$msg_body = <<<msg
 <div class="notice notice-success is-dismissible">
 <p>$msg</p>
@@ -240,7 +320,85 @@ msg;
 		return $msg_body;
 	}
 	public function menu_add_field(){
+		if( isset($_REQUEST['act']) && $_REQUEST['act'] === 'edit'){
+			include_once 'partials/cfwjm-admin-edit-page.php';
+			return;
+		}
+
 		include_once 'partials/cfwjm-admin-menu-add-field.php';
 		// include_once 'partials/cfwjm-admin-display.php';
 	}
+	public function cfwjm_render($fields){
+		$cfields = Cfwjm_Db::getAll();
+		if(count($cfields) === 0){
+			return $fields;
+		}
+		// $fields['_test_key'] = [
+		// 	'label'	=>	'test_label',
+		// 	'type'	=>	'text',
+		// 	'placeholder'	=>	'test_placeholder',
+		// 	'description'	=>	'test_descrtiption',
+		// 	'classes'	=>	['job-manager-datepicker']
+		// ];
+		foreach($cfields as $field){
+			$fields['_' . $field['field_key']] = [
+				'label'	=>	$field['label'],
+				'type'	=>	$field['type'],
+				'placeholder'	=>	$field['placeholder'],
+				'description'	=>	$field['description']
+			];
+			if(!empty($field['meta_1'])){
+				$meta1 = $field['meta_1'];
+				$options = explode(",", $meta1);
+
+				$field_options= [];				
+				foreach($options as $option){
+					$field_options[$option] = $option;
+				}
+				$fields['_' . $field['field_key']]['options'] = $field_options;
+				$fields['_' . $field['field_key']]['default'] = $option;
+			}
+
+			switch($field['type']){
+				case 'date':
+					$fields['_' . $field['field_key']]['classes'] = ['job-manager-datepicker'];
+					$fields['_' . $field['field_key']]['type'] = 'text';
+				break;
+			}
+		}
+		
+		  return $fields;
+	}
+	function retrieve_columns($columns){
+		$cfields = Cfwjm_Db::getAll();
+		if(count($cfields) === 0){
+			return $columns;
+		}
+		foreach($cfields as $field){
+			$columns[$field['field_key']] = $field['label'];
+		}
+		// $columns['job_salary']         = __( 'Salary', 'wpjm-extra-fields' );
+		return $columns;	
+	}
+	// public function display_columns($column){
+	// 	global $post;
+
+	// 	$cfields = Cfwjm_Db::getAll();
+
+	// 	switch ($column) {
+	// 		case 'job_salary':
+			
+	// 		$salary = get_post_meta( $post->ID, '_job_salary', true );
+			
+	// 		if ( !empty($salary)) {
+	// 			echo $salary;
+	// 		} else {
+	// 			echo '-';
+			
+	// 		}
+	// 		break;
+	// 	}
+
+	// 	return $column;
+	// }
 }

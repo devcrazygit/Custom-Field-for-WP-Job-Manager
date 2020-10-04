@@ -20,7 +20,7 @@
  */
 
 global $cfwjm_db_version;
-$cfwjm_db_version = '1.0';
+$cfwjm_db_version = '1.1';
 class Cfwjm_Db {
 
     public function __constructor(){
@@ -32,6 +32,7 @@ class Cfwjm_Db {
         $field_tbl_name = self::fieldTableName();
         $sql = "CREATE TABLE $field_tbl_name (
                 id int(11) NOT NULL AUTO_INCREMENT,
+                field_key varchar(30) DEFAULT 'cfwjm_key' NOT NULL, 
                 label varchar(100) DEFAULT '' NOT NULL,
                 type varchar(20) DEFAULT 'text' NOT NULL,
                 placeholder varchar(100),
@@ -66,8 +67,35 @@ class Cfwjm_Db {
         global $wpdb;
         return $wpdb->insert(self::fieldTableName(), $field_data);
     }
+    public static function updateField($field_data, $id){
+        global $wpdb;
+        return $wpdb->update(self::fieldTableName(), $field_data, ['id' => $id]);
+    }
     public static function deleteField($where){
         global $wpdb;
         return $wpdb->delete(self::fieldTableName(), $where);
+    }
+    public static function get($id){
+        global $wpdb;
+        $tbl_name = self::fieldTableName();        
+        return $wpdb->get_row($wpdb->prepare("select * from $tbl_name where id=%d", $id), ARRAY_A );
+    }
+    public static function getWhere($where, $glue = "and"){
+        global $wpdb;
+        $tbl_name = self::fieldTableName();        
+
+        $where_phrase = [];
+        $vals = [];
+        foreach($where as $k => $v){
+            $where_phrase[] = $k . "=%s";
+            $vals[] = $v;
+        }
+        $where = "where " . implode(" ". $glue . " ", $where_phrase);        
+        return $wpdb->get_row($wpdb->prepare("select * from $tbl_name $where", $vals), ARRAY_A);
+    }
+    public static function getAll(){
+        global $wpdb;
+        $tbl_name = self::fieldTableName();
+        return $wpdb->get_results("select * from $tbl_name", ARRAY_A );
     }
 }

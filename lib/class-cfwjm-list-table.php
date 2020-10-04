@@ -28,6 +28,7 @@ use Cfwjm\lib\WP_List_Table;
 include_once 'class-wp-list-table.php';
 // require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 include_once CFWJM_INCLUDE_PATH . 'class-cfwjm-db.php';
+include_once CFWJM_ADMIN_PATH . 'class-cfwjm-admin.php';
 
 class Cfwjm_ListTable extends WP_List_Table {
     
@@ -42,7 +43,8 @@ class Cfwjm_ListTable extends WP_List_Table {
     public function get_columns(){
         
         $columns = array(
-            'cb'        =>  '<input type="checkbox" />',            
+            'cb'        =>  '<input type="checkbox" />',      
+            'field_key' =>  __('Key', $this->plugin_name),      
             'label'     =>  __('Label', $this->plugin_name),
             'type'      =>  __('Type', $this->plugin_name),
             'placeholder'=> __('Placeholder', $this->plugin_name),
@@ -104,7 +106,7 @@ class Cfwjm_ListTable extends WP_List_Table {
         $offset = ( $currentPage - 1 ) * $perPage;
         $limit = $perPage;
 
-        $query = "select id, label, type, placeholder, priority, required, description, cfwjm_tag 
+        $query = "select id,field_key, label, type, placeholder, priority, required, description, cfwjm_tag 
             from $tbl_name order by $orderby $order limit $offset, $limit;";
         
         $totalItems = $wpdb->get_var("select count(*) from $tbl_name;");
@@ -123,13 +125,15 @@ class Cfwjm_ListTable extends WP_List_Table {
         switch($column_name){
             case 'required':
                 return empty($item['required']) ? "" : __("required", $this->plugin_name);
-            case 'label':
+            case 'field_key':
                 $id = $item['id'];
+
+                $plg_slug = Cfwjm_Admin::PLUGIN_SLUG;
                 $actions = array(
-                    'edit'  =>  "<a href='edit.php?post_type=job_listing&page=cfjm_menu_add_field&action=edit&id=$id'>" . __("Edit", $this->plugin_name) . "</a>",
-                    'delete'=>  "<a href='edit.php?post_type=job_listing&page=cfjm_menu_add_field&action=delete&id=$id'>" . __("Delete", $this->plugin_name) . "</a>"
+                    'edit'  =>  "<a href='$plg_slug&page=cfjm_menu_add_field&act=edit&id=$id'>" . __("Edit", $this->plugin_name) . "</a>",
+                    'delete'=>  "<a href='$plg_slug&page=cfjm_menu_add_field&action=delete&id=$id'>" . __("Delete", $this->plugin_name) . "</a>"
                 );
-                return sprintf("%s %s", $item['cfwjm_tag'], $this->row_actions($actions));                
+                return sprintf("%s %s", $item['field_key'], $this->row_actions($actions));                
             default:
                 return $item[$column_name];                
         }

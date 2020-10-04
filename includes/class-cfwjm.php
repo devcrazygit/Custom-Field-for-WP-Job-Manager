@@ -57,6 +57,8 @@ class Cfwjm {
 	 */
 	protected $version;
 
+	protected $custom_routes = [];
+
 	/**
 	 * Define the core functionality of the plugin.
 	 *
@@ -157,12 +159,19 @@ class Cfwjm {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );			
 		$this->loader->add_action('admin_menu', $plugin_admin, 'add_menu', 12);
-
+		
 		$this->loader->add_action('cfwjm_fields_list', $plugin_admin, 'cfwjm_fields_list', 1);
 		$this->loader->add_action('cfwjm_fields_form', $plugin_admin, 'cfwjm_fields_form');
-		$this->loader->add_action('admin_post_cfwjm_add_field', $plugin_admin, 'cfwjm_add_field');		
+		$this->loader->add_action('cfwjm_fields_edit_form', $plugin_admin, 'cfwjm_fields_edit_form');
+		$this->loader->add_action('admin_post_cfwjm_add_field', $plugin_admin, 'cfwjm_add_field');
+		$this->loader->add_action('admin_post_cfwjm_edit_field', $plugin_admin, 'cfwjm_edit_field');	
+		
+		// WP Job Manager hook
+		$this->loader->add_filter( 'job_manager_job_listing_data_fields', $plugin_admin, 'cfwjm_render' ); // #
+		$this->loader->add_filter( 'submit_job_form_fields', $plugin_admin, 'cfwjm_render' ); // #	
+		// $this->loader->add_filter( 'manage_job_listing_posts_custom_column', $plugin_admin, 'display_columns' );			
 	}
-
+	
 	/**
 	 * Register all of the hooks related to the public-facing functionality
 	 * of the plugin.
@@ -175,7 +184,8 @@ class Cfwjm {
 		$plugin_public = new Cfwjm_Public($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );		
+		// Dashboard: Job Listings > Jobs filters
 	}
 
 	/**
@@ -217,5 +227,6 @@ class Cfwjm {
 	public function get_version() {
 		return $this->version;
 	}
+
 
 }
