@@ -41,6 +41,8 @@
                 <option value="radio">Radio</option>
                 <option value="select">Select</option>
                 <option value="text">Text</option>
+                <option value="checkbox">Check Box</option>
+                <option value="tags">Tag Input</option>
             </select>
             <p>This is the type of the field</p>
         </div>

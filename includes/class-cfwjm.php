@@ -164,8 +164,8 @@ class Cfwjm {
 		$this->loader->add_action('cfwjm_fields_form', $plugin_admin, 'cfwjm_fields_form');
 		$this->loader->add_action('cfwjm_fields_edit_form', $plugin_admin, 'cfwjm_fields_edit_form');
 		$this->loader->add_action('admin_post_cfwjm_add_field', $plugin_admin, 'cfwjm_add_field');
-		$this->loader->add_action('admin_post_cfwjm_edit_field', $plugin_admin, 'cfwjm_edit_field');	
-		
+		$this->loader->add_action('admin_post_cfwjm_edit_field', $plugin_admin, 'cfwjm_edit_field');		
+		$this->loader->add_action('job_manager_input_tags', $plugin_admin, 'cfwjm_checkbox_tags_input', 10, 2);
 		// WP Job Manager hook
 		$this->loader->add_filter( 'job_manager_job_listing_data_fields', $plugin_admin, 'cfwjm_render' ); // #
 		$this->loader->add_filter( 'submit_job_form_fields', $plugin_admin, 'cfwjm_render' ); // #	

@@ -249,9 +249,9 @@ class Cfwjm_Admin {
 		$data['field_key'] = empty($_POST['tag-field-key']) ? null : $_POST['tag-field-key'];
 		$data['label'] = empty($_POST['tag-label']) ? null : $_POST['tag-label'];
 		$data['type'] = empty($_POST['tag-type']) ? null : $_POST['tag-type'];
-		if($data['type'] === 'radio' || $data['type'] === 'select'){
-			$data['meta_1'] = empty($_POST['tag-meta']) ? '' : $_POST['tag-meta'];
-		}
+		// if($data['type'] === 'radio' || $data['type'] === 'select' || $data['type'] === 'checkbox'){
+		$data['meta_1'] = empty($_POST['tag-meta']) ? '' : $_POST['tag-meta'];
+		// }
 		$data['placeholder'] = empty($_POST['tag-placeholder']) ? '' : $_POST['tag-placeholder'];
 		$data['priority'] = empty($_POST['tag-priority']) ? 10 : $_POST['tag-priority'];
 		$data['required'] = empty($_POST['tag-required']) ? 0 : $_POST['tag-required'];
@@ -356,18 +356,43 @@ msg;
 					$field_options[$option] = $option;
 				}
 				$fields['_' . $field['field_key']]['options'] = $field_options;
-				$fields['_' . $field['field_key']]['default'] = $option;
+				$fields['_' . $field['field_key']]['default'] = $option;				
 			}
 
 			switch($field['type']){
 				case 'date':
 					$fields['_' . $field['field_key']]['classes'] = ['job-manager-datepicker'];
-					$fields['_' . $field['field_key']]['type'] = 'text';
+					$fields['_' . $field['field_key']]['type'] = 'text';				
 				break;
 			}
 		}
 		
 		  return $fields;
+	}
+	function cfwjm_checkbox_tags_input($key, $field){
+		if ( ! empty( $field['name'] ) ) {
+			$name = $field['name'];
+		} else {
+			$name = $key;
+		}
+		if ( ! empty( $field['classes'] ) ) {
+			$classes = implode( ' ', is_array( $field['classes'] ) ? $field['classes'] : [ $field['classes'] ] );
+		} else {
+			$classes = '';
+		}		
+			?>			
+			<p class="form-field">
+			<label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( wp_strip_all_tags( $field['label'] ) ); ?>:
+			<?php if ( ! empty( $field['description'] ) ) : ?>
+				<span class="tips" data-tip="<?php echo esc_attr( $field['description'] ); ?>">[?]</span>
+			<?php endif; ?>
+			</label>
+				<input name="<?php echo esc_attr( $name ); ?>" type="text" 
+					class="<?php echo esc_attr( $classes ); ?>"
+					id="<?php echo esc_attr( $key ); ?>" placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>" value="<?php echo esc_attr( $field['value'] ); ?>"
+					data-role="tagsinput"/>				
+			</p>
+			<?php
 	}
 	function retrieve_columns($columns){
 		$cfields = Cfwjm_Db::getAll();
