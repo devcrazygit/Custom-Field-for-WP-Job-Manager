@@ -394,6 +394,46 @@ msg;
 			</p>
 			<?php
 	}
+	function cfwjm_checkbox_checkbox_group($key, $field){
+		if ( ! empty( $field['name'] ) ) {
+			$name = $field['name'];
+		} else {
+			$name = $key;
+		}
+		if ( ! empty( $field['classes'] ) ) {
+			$classes = implode( ' ', is_array( $field['classes'] ) ? $field['classes'] : [ $field['classes'] ] );
+		} else {
+			$classes = '';
+		}		
+			?>
+			<p class="form-field">
+			<label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( wp_strip_all_tags( $field['label'] ) ); ?>:
+			<?php if ( ! empty( $field['description'] ) ) : ?>
+				<span class="tips" data-tip="<?php echo esc_attr( $field['description'] ); ?>">[?]</span>
+			<?php endif; ?>			
+			</label>
+
+			<?php 
+			$field_options = $field['options'];
+			foreach($field_options as $field_option){
+				$option_arr = explode(":", $field_option);
+				if(count($option_arr) < 2){
+					continue;
+				}
+				$option_key = $option_arr[0];
+				$option_label = $option_arr[1];
+			?>
+			<input type="checkbox" class="input-checkbox" style="width:initial;"
+				name="<?php echo esc_attr( isset( $field['name'] ) ? $field['name'] : $key ) . "[$option_key]"; ?>" 
+				id="<?php echo esc_attr( $key ) . "_$option_key"; ?>" 
+				<?php checked( ! empty( $field['value'][$option_key] ), true ); ?> 
+				value="1" <?php if ( ! empty( $field['required'] ) ) echo 'required'; ?> />
+				<span><?php echo wp_kses_post( $option_label ); ?></span>
+				
+			<?php } ?>
+			</p>
+			<?php
+	}
 	function retrieve_columns($columns){
 		$cfields = Cfwjm_Db::getAll();
 		if(count($cfields) === 0){
