@@ -43,7 +43,7 @@
                 <option value="text">Text</option>
                 <option value="checkbox">Check Box</option>
                 <option value="tags">Tag Input</option>
-                <option value="checkbox_group">Check Box</option>
+                <option value="checkbox_group">Check Box Group</option>
             </select>
             <p>This is the type of the field</p>
         </div>
