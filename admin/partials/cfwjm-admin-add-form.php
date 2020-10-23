@@ -34,6 +34,12 @@
             <input name="tag-label" type="text" value="<?php echo $val['label']; ?>" required>
             <p>The label appears before the field</p>
         </div>
+        <div class="form-field form-required label-wrap">
+            <label for="tag-is_job"><?php echo __("Arena", $this->plugin_name); ?></label>
+            <input name="tag-is_job" type="radio" value="1" <?php if($val['is_job']) echo 'checked'; ?> ><span style="margin-right: 20px;" >Job Field </span>
+            <input name="tag-is_job" type="radio" value="0" <?php if(empty($val['is_job'])) echo 'checked';  ?>>Company Field
+            <p>Choose whether job or company field</p>
+        </div>
         <div class="form-field">
             <label for="tag-type"><?php echo __("Type", $this->plugin_name); ?></label>
             <select name="tag-type" style="min-width: 95%;" data-value="<?php echo $val['type']; ?>" required>

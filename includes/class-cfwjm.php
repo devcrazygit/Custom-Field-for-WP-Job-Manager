@@ -170,7 +170,7 @@ class Cfwjm {
 
 		// WP Job Manager hook
 		$this->loader->add_filter( 'job_manager_job_listing_data_fields', $plugin_admin, 'cfwjm_render' ); // #
-		$this->loader->add_filter( 'submit_job_form_fields', $plugin_admin, 'cfwjm_render' ); // #	
+		$this->loader->add_filter( 'submit_job_form_fields', $plugin_admin, 'cfwjm_submit_form_fields'); // #	
 		// $this->loader->add_filter( 'manage_job_listing_posts_custom_column', $plugin_admin, 'display_columns' );			
 	}
 	

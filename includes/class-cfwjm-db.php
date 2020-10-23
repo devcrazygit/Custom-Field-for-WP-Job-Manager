@@ -20,7 +20,7 @@
  */
 
 global $cfwjm_db_version;
-$cfwjm_db_version = '1.1';
+$cfwjm_db_version = '1.2'; // add is_job field
 class Cfwjm_Db {
 
     public function __constructor(){
@@ -39,6 +39,7 @@ class Cfwjm_Db {
                 priority tinyint(1) DEFAULT 10 NOT NULL,
                 required tinyint(1) DEFAULT 0 NOT NULL,
                 description varchar(150),
+                is_job tinyint(1) DEFAULT 0 NOT NULL,
                 cfwjm_tag varchar(20),                
                 meta_1 text,
                 meta_2 text,

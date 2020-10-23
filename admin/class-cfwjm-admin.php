@@ -169,6 +169,7 @@ class Cfwjm_Admin {
 			$val['field_key'] = '';
 			$val['label'] = "";
 			$val['type'] = 'text';
+			$val['is_job'] = 1;
 			$val['meta_1'] = '';
 			$val['placeholder'] = '';
 			$val['priority'] = 10;
@@ -257,6 +258,7 @@ class Cfwjm_Admin {
 		$data['required'] = empty($_POST['tag-required']) ? 0 : $_POST['tag-required'];
 		$data['description'] = empty($_POST['tag-description']) ? '' : $_POST['tag-description'];
 		$data['cfwjm_tag'] = empty($_POST['tag-cfwjm-tag']) ? 'cfwjm_tag' : $_POST['tag-cfwjm-tag'];
+		$data['is_job'] = empty($_POST['tag-is_job']) ? 0 : $_POST['tag-is_job'];
 		
 		return $data;
 	}
@@ -328,7 +330,7 @@ msg;
 		include_once 'partials/cfwjm-admin-menu-add-field.php';
 		// include_once 'partials/cfwjm-admin-display.php';
 	}
-	public function cfwjm_render($fields){
+	public function cfwjm_render($fields){		
 		$cfields = Cfwjm_Db::getAll();
 		if(count($cfields) === 0){
 			return $fields;
@@ -345,7 +347,8 @@ msg;
 				'label'	=>	$field['label'],
 				'type'	=>	$field['type'],
 				'placeholder'	=>	$field['placeholder'],
-				'description'	=>	$field['description']
+				'description'	=>	$field['description'],
+				'required'	=>	$field['required'],
 			];
 			if(!empty($field['meta_1'])){
 				$meta1 = $field['meta_1'];
@@ -368,6 +371,49 @@ msg;
 		}
 		
 		  return $fields;
+	}
+	public function cfwjm_submit_form_fields($fields){
+		$cfields = Cfwjm_Db::getAll();
+		if(count($cfields) === 0){
+			return $fields;
+		}
+		foreach($cfields as $field){
+			$is_job = !empty($field['is_job']);
+			$field_data = [
+				'label'	=>	$field['label'],
+				'type'	=>	$field['type'],
+				'required'=> $field['required'],
+				'placeholder'=>	$field['placeholder'],
+				'description'=>	$field['description'],
+				'priority'	=>	$field['priority']
+			];
+			if($is_job){
+				$arena_key = 'job';				
+			}else{
+				$arena_key = 'company';				
+			}
+			$fields[$arena_key][$field['field_key']] = $field_data;
+			if(!empty($field['meta_1'])){
+				$meta1 = $field['meta_1'];
+				$options = explode(",", $meta1);
+
+				$field_options= [];				
+				foreach($options as $option){
+					$field_options[$option] = $option;
+				}
+				$fields[$arena_key][$field['field_key']]['options'] = $field_options;
+				$fields[$arena_key][$field['field_key']]['default'] = $option;				
+			}
+
+			switch($field['type']){
+				case 'date':
+					$fields[$arena_key][$field['field_key']]['classes'] = ['job-manager-datepicker'];
+					$fields[$arena_key][$field['field_key']]['type'] = 'text';				
+				break;
+			}
+		}
+		return $fields;
+
 	}
 	function cfwjm_checkbox_tags_input($key, $field){
 		if ( ! empty( $field['name'] ) ) {

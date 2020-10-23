@@ -46,6 +46,7 @@ class Cfwjm_ListTable extends WP_List_Table {
             'cb'        =>  '<input type="checkbox" />',      
             'field_key' =>  __('Key', $this->plugin_name),      
             'label'     =>  __('Label', $this->plugin_name),
+            'is_job'    =>  __('Arena', $this->plugin_name),
             'type'      =>  __('Type', $this->plugin_name),
             'placeholder'=> __('Placeholder', $this->plugin_name),
             'priority'  =>  __('Priority', $this->plugin_name),
@@ -106,7 +107,7 @@ class Cfwjm_ListTable extends WP_List_Table {
         $offset = ( $currentPage - 1 ) * $perPage;
         $limit = $perPage;
 
-        $query = "select id,field_key, label, type, placeholder, priority, required, description, cfwjm_tag 
+        $query = "select id,field_key, label, is_job, type, placeholder, priority, required, description, cfwjm_tag 
             from $tbl_name order by $orderby $order limit $offset, $limit;";
         
         $totalItems = $wpdb->get_var("select count(*) from $tbl_name;");
@@ -133,7 +134,9 @@ class Cfwjm_ListTable extends WP_List_Table {
                     'edit'  =>  "<a href='$plg_slug&page=cfjm_menu_add_field&act=edit&id=$id'>" . __("Edit", $this->plugin_name) . "</a>",
                     'delete'=>  "<a href='$plg_slug&page=cfjm_menu_add_field&action=delete&id=$id'>" . __("Delete", $this->plugin_name) . "</a>"
                 );
-                return sprintf("%s %s", $item['field_key'], $this->row_actions($actions));                
+                return sprintf("%s %s", $item['field_key'], $this->row_actions($actions)); 
+            case 'is_job':
+                return $item['is_job'] ? __("Job Field", $this->plugin_name) : __("Company Field", $this->plugin_name);
             default:
                 return $item[$column_name];                
         }
