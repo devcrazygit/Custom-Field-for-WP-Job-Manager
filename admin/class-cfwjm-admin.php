@@ -3,7 +3,7 @@
 /**
  * The admin-specific functionality of the plugin.
  *
- * @link       https://devcrazy.com
+ * @link       https://devcrazygit.github.io/
  * @since      1.0.0
  *
  * @package    Cfwjm
@@ -62,8 +62,8 @@ class Cfwjm_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
-		include_once CFWJM_LIB_PATH . "\\class-cfwjm-list-table.php";
-		include_once CFWJM_INCLUDE_PATH . "\\class-cfwjm-loader.php";
+		include_once CFWJM_LIB_PATH . "/class-cfwjm-list-table.php";
+		include_once CFWJM_INCLUDE_PATH . "/class-cfwjm-loader.php";
 		$this->backlink_page = self::PLUGIN_SLUG . '&page=cfjm_menu_add_field';
 	}
 

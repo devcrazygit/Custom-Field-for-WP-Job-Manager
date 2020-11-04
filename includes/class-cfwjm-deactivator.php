@@ -3,7 +3,7 @@
 /**
  * Fired during plugin deactivation
  *
- * @link       https://devcrazy.com
+ * @link       https://devcrazygit.github.io/
  * @since      1.0.0
  *
  * @package    Cfwjm
