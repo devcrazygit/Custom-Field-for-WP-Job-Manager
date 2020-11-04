@@ -53,6 +53,6 @@ We can use this `Cfwjm Tag` for future purposes in the next version.
 **Note:** `Key` attribute is snake-case(recommended) while `Label` is any format you want.
 `Key` is used for management purposes and `Label` is displayed on the front-end.
 
-For example, ```salary_type``` is for `Key` and ```Salary Type``` is for `Label`
+For example, *salary_type* is for `Key` and *Salary Type* is for `Label`
 
 And `Arena` is to indicate whether Job specific or a Company specific field.
