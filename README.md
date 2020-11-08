@@ -2,6 +2,7 @@
 Contributors: devcrazy
 
 Donate link: https://paypal.me/888999517
+Wordpress Plugin url:https://wordpress.org/plugins/custom-job-fields-for-wp-job-manager
 
 Tags: wp-job-manager, custom field, job board
 
