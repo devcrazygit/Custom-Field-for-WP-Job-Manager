@@ -62,8 +62,8 @@ class Cfwjm_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
-		include_once CFWJM_LIB_PATH . "\\class-cfwjm-list-table.php";
-		include_once CFWJM_INCLUDE_PATH . "\\class-cfwjm-loader.php";
+		include_once CFWJM_LIB_PATH . "class-cfwjm-list-table.php";
+		include_once CFWJM_INCLUDE_PATH . "class-cfwjm-loader.php";
 		$this->backlink_page = self::PLUGIN_SLUG . '&page=cfjm_menu_add_field';
 	}
 
@@ -480,6 +480,33 @@ msg;
 			</p>
 			<?php
 	}
+	function cfwjm_star_rating_input($key, $field){
+		if ( ! empty( $field['name'] ) ) {
+			$name = $field['name'];
+		} else {
+			$name = $key;
+		}
+		if ( ! empty( $field['classes'] ) ) {
+			$classes = implode( ' ', is_array( $field['classes'] ) ? $field['classes'] : [ $field['classes'] ] );
+		} else {
+			$classes = '';
+		}		
+			?>
+			<p class="form-field">
+			<label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( wp_strip_all_tags( $field['label'] ) ); ?>:
+			<?php if ( ! empty( $field['description'] ) ) : ?>
+				<span class="tips" data-tip="<?php echo esc_attr( $field['description'] ); ?>">[?]</span>
+			<?php endif; ?>
+			</label>
+			<input type="number" 
+				name="<?php echo esc_attr( isset( $field['name'] ) ? $field['name'] : $key ); ?>" 
+				id="<?php echo esc_attr( $key ); ?>" 
+				min="0" max="5" step="0.5"
+				<?php if ( ! empty( $field['required'] ) ) echo 'required'; ?> />
+			</p>
+			<?php
+	}
+
 	function retrieve_columns($columns){
 		$cfields = Cfwjm_Db::getAll();
 		if(count($cfields) === 0){

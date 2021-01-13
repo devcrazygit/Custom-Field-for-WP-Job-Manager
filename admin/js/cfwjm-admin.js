@@ -32,24 +32,40 @@
 		let tag_type_tag = $("select[name='tag-type']");
 		let meta_tag = $(".form-field.type_meta");
 
+		var in_array = function (needle, haystack) {
+			var length = haystack.length;
+			for(var i = 0; i < length; i++) {
+				if(haystack[i] == needle) return true;
+			}
+			return false;
+		}
+		var meta_tag_list = [
+			"radio",
+			"select",
+			"checkbox",
+			"tags",
+			"checkbox_group",
+		]
+
 		tag_type_tag.val(tag_type_tag.data('value'));
 		tag_type_tag.on("change", function(){
 			let type = tag_type_tag.val()
-			if(type === "date" || type === "text"){
-				meta_tag.hide();
+			if(in_array(type, meta_tag_list)){
+				meta_tag.show();		
 				return;
 			}
-			meta_tag.show();		
+			meta_tag.hide();
 		})
 		let type = tag_type_tag.val()
-		if(type === "date" || type === "text"){
-			meta_tag.hide();
-		}else{
+		
+		
+		if (in_array(type, meta_tag_list)) {
 			meta_tag.show();
+		} else {
+			meta_tag.hide();
 		}
 
 		let meta_input = $("select[name='tag-meta']");
-		let meta_value = meta_input.val();
 		meta_input.tagsinput('add', meta_input);
 
 		let priority_tag = $("select[name='tag-priority']");

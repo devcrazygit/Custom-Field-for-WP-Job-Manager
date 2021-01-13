@@ -37,9 +37,9 @@ session_start();
  */
 define( 'CFWJM_VERSION', '1.0.0' );
 
-define('CFWJM_LIB_PATH', __DIR__ . '\\lib\\');
-define('CFWJM_INCLUDE_PATH', __DIR__ . "\\includes\\");
-define('CFWJM_ADMIN_PATH', __DIR__ . "\\admin\\");
+define('CFWJM_LIB_PATH', __DIR__ . '/lib/');
+define('CFWJM_INCLUDE_PATH', __DIR__ . "/includes/");
+define('CFWJM_ADMIN_PATH', __DIR__ . "/admin/");
 
 
 /**
