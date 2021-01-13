@@ -3,7 +3,7 @@
 /**
  * The admin-specific functionality of the plugin.
  *
- * @link       https://devcrazy.com
+ * @link       https://devcrazygit.github.io/
  * @since      1.0.0
  *
  * @package    Cfwjm
@@ -126,8 +126,8 @@ class Cfwjm_Admin {
 		// );
 		$hook_suffix = add_submenu_page(
 			self::PLUGIN_SLUG,
-			__('Job Manager Custom Fields', $this->plugin_name),
-			__('Job Manager Custom Fields', $this->plugin_name),
+			esc_html__('Job Manager Custom Fields', $this->plugin_name),
+			esc_html__('Job Manager Custom Fields', $this->plugin_name),
 			'manage_options',
 			$this->menu_prefix . "add_field",
 			[$this, 'menu_add_field']
@@ -138,7 +138,7 @@ class Cfwjm_Admin {
 		include_once plugin_dir_path(__FILE__) . '../lib/class-cfwjm-list-table.php';
 
 		$arguments = array(
-			'label'		=>	__( 'Custom Fields', $this->plugin_name ),
+			'label'		=>	esc_html__( 'Custom Fields', $this->plugin_name ),
 			'default'	=>	5,
 			'option'	=>	'cfwjm_per_page'
 		);
@@ -184,10 +184,10 @@ class Cfwjm_Admin {
 		if(current_user_can('administrator')){
 			$action = 'cfwjm_edit_field';
 			$nounce_name = "cfwjm_edit_message";			
-			$id = $_REQUEST['id'];
+			$id = sanitize_text_field($_REQUEST['id']);
 			$val = Cfwjm_Db::get($id);
 			if(empty($val)){
-				wp_die(__("No such a field", $this->plugin_name));
+				wp_die(esc_html__("No such a field", $this->plugin_name));
 			}			
 			include_once 'partials/cfwjm-admin-add-form.php';
 		}
@@ -196,22 +196,27 @@ class Cfwjm_Admin {
 		if ( ! isset( $_POST['cfwjm_edit_message'] ) 
 			|| ! wp_verify_nonce( $_POST['cfwjm_edit_message'], 'cfwjm_edit_field') || empty($_REQUEST['id'])){
 			wp_die( 
-				__( 'Invalid nonce specified', $this->plugin_name ),
-				__( 'Error', $this->plugin_name ), [
+				esc_html__( 'Invalid nonce specified', $this->plugin_name ),
+				esc_html__( 'Error', $this->plugin_name ), [
 					'response' 	=> 403,
 					'back_link' => $this->backlink_page
 				]);
 		}else{
+			if( !session_id() )
+			{
+				session_start();
+			}
 			$data = $this->validate();
 			if(empty($data)){
 				return;
 			}
-			$id = $_REQUEST['id'];
+			$id = sanitize_text_field($_REQUEST['id']);
 			$res = Cfwjm_Db::updateField($data, $id);
+			
 			if($res === false){
-				$_SESSION['cfwjm_msg'] = $this->error_notice(__("Update failed", $this->plugin_name));
+				$_SESSION['cfwjm_msg'] = $this->error_notice(esc_html__("Update failed", $this->plugin_name));
 			}
-			$_SESSION['cfwjm_msg'] = $this->success_notice(__("Successfully updated", $this->plugin_name));
+			$_SESSION['cfwjm_msg'] = $this->success_notice(esc_html__("Successfully updated", $this->plugin_name));
 			wp_redirect($this->backlink_page);
 		}
 	}
@@ -223,12 +228,16 @@ class Cfwjm_Admin {
 			|| ! wp_verify_nonce( $_POST['cfwjm_add_message'], 'cfwjm_add_field' ) 
 		) {
 			wp_die( 
-				__( 'Invalid nonce specified', $this->plugin_name ),
-				__( 'Error', $this->plugin_name ), [
+				esc_html__( 'Invalid nonce specified', $this->plugin_name ),
+				esc_html__( 'Error', $this->plugin_name ), [
 					'response' 	=> 403,
 					'back_link' => $this->backlink_page
 				]);
 		} else {
+			if( !session_id() )
+			{
+				session_start();
+			}
 			$data = $this->validate();
 			if(empty($data)){
 				return;
@@ -236,7 +245,7 @@ class Cfwjm_Admin {
 			
 			$res = Cfwjm_Db::insertField($data);
 			if($res === false){
-				$error_msg = __("Db insert failed", $this->plugin_name);
+				$error_msg = esc_html__("Db insert failed", $this->plugin_name);
 				$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
 				wp_redirect($this->backlink_page);
 				return;
@@ -247,18 +256,18 @@ class Cfwjm_Admin {
 	}
 	public function post_data(){
 		$data = [];
-		$data['field_key'] = empty($_POST['tag-field-key']) ? null : $_POST['tag-field-key'];
-		$data['label'] = empty($_POST['tag-label']) ? null : $_POST['tag-label'];
-		$data['type'] = empty($_POST['tag-type']) ? null : $_POST['tag-type'];
+		$data['field_key'] = empty($_POST['tag-field-key']) ? null : sanitize_key( wp_unslash($_POST['tag-field-key']));
+		$data['label'] = empty($_POST['tag-label']) ? null : sanitize_textarea_field(wp_unslash($_POST['tag-label']));
+		$data['type'] = empty($_POST['tag-type']) ? null : sanitize_text_field( wp_unslash($_POST['tag-type']));
 		// if($data['type'] === 'radio' || $data['type'] === 'select' || $data['type'] === 'checkbox'){
-		$data['meta_1'] = empty($_POST['tag-meta']) ? '' : $_POST['tag-meta'];
+		$data['meta_1'] = empty($_POST['tag-meta']) ? '' : wp_unslash($_POST['tag-meta']);
 		// }
-		$data['placeholder'] = empty($_POST['tag-placeholder']) ? '' : $_POST['tag-placeholder'];
-		$data['priority'] = empty($_POST['tag-priority']) ? 10 : $_POST['tag-priority'];
-		$data['required'] = empty($_POST['tag-required']) ? 0 : $_POST['tag-required'];
-		$data['description'] = empty($_POST['tag-description']) ? '' : $_POST['tag-description'];
-		$data['cfwjm_tag'] = empty($_POST['tag-cfwjm-tag']) ? 'cfwjm_tag' : $_POST['tag-cfwjm-tag'];
-		$data['is_job'] = empty($_POST['tag-is_job']) ? 0 : $_POST['tag-is_job'];
+		$data['placeholder'] = empty($_POST['tag-placeholder']) ? '' : sanitize_textarea_field( $_POST['tag-placeholder']);
+		$data['priority'] = empty($_POST['tag-priority']) ? 10 : sanitize_text_field( wp_unslash($_POST['tag-priority']));
+		$data['required'] = empty($_POST['tag-required']) ? 0 : sanitize_text_field( wp_unslash($_POST['tag-required']));
+		$data['description'] = empty($_POST['tag-description']) ? '' : sanitize_textarea_field($_POST['tag-description']);
+		$data['cfwjm_tag'] = empty($_POST['tag-cfwjm-tag']) ? 'cfwjm_tag' : sanitize_key( wp_unslash($_POST['tag-cfwjm-tag']));
+		$data['is_job'] = empty($_POST['tag-is_job']) ? 0 : sanitize_text_field(wp_unslash($_POST['tag-is_job']));
 		
 		return $data;
 	}
@@ -266,26 +275,26 @@ class Cfwjm_Admin {
 	public function validate(){
 		$data = $this->post_data();
 		if(empty($data['label'])){
-			$error_msg = sprintf(__("%s is required", $this->plugin_name), __("Label", $this->plugin_name));
+			$error_msg = sprintf(esc_html__("%s is required", $this->plugin_name), esc_html__("Label", $this->plugin_name));
 			$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
 			wp_redirect($this->backlink_page);
 			return null;
 		}
 		if(empty($data['field_key'])){
-			$error_msg = sprintf(__("%s is required", $this->plugin_name), __("Key", $this->plugin_name));
+			$error_msg = sprintf(esc_html__("%s is required", $this->plugin_name), esc_html__("Key", $this->plugin_name));
 			$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
 			wp_redirect($this->backlink_page);
 			return null;
 		}
 		if(empty($data['type'])){
-			$error_msg = sprintf(__("%s is required", $this->plugin_name), __("Type", $this->plugin_name));
+			$error_msg = sprintf(esc_html__("%s is required", $this->plugin_name), esc_html__("Type", $this->plugin_name));
 			$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
 			wp_redirect($this->backlink_page);
 			return null;
 		}
 		if($data['type'] === 'radio' || $data['type'] === 'select'){
 			if(empty($data['meta_1'])){					
-				$error_msg = sprintf(__("%s must be specified.", $this->plugin_name), __("Items", $this->plugin_name));					
+				$error_msg = sprintf(esc_html__("%s must be specified.", $this->plugin_name), esc_html__("Items", $this->plugin_name));					
 				$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);					
 				wp_redirect($this->backlink_page); 
 				return null;
@@ -294,7 +303,7 @@ class Cfwjm_Admin {
 		$existing = Cfwjm_Db::getWhere(['label' => $data['label'], 'field_key' => $data['field_key']], "or");
 		$id = isset($_REQUEST['id']) ? $_REQUEST['id'] : -1;			
 		if(!empty($existing) && $existing['id'] != $id){			
-			$error_msg = __("Label and Key Name must be unique", $this->plugin_name);
+			$error_msg = esc_html__("Label and Key Name must be unique", $this->plugin_name);
 			$_SESSION['cfwjm_msg'] = $this->error_notice($error_msg);
 			wp_redirect($this->backlink_page);
 			return null;
@@ -304,7 +313,7 @@ class Cfwjm_Admin {
 
 	public function success_notice($msg = null){
 		if(empty($msg)){
-			$msg = __('Add field success', $this->plugin_name);
+			$msg = esc_html__('Add field success', $this->plugin_name);
 		}
 		$msg_body = <<<msg
 <div class="notice notice-success is-dismissible">

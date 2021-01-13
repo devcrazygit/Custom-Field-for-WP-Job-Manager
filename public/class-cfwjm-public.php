@@ -3,7 +3,7 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       https://devcrazy.com
+ * @link       https://devcrazygit.github.io/
  * @since      1.0.0
  *
  * @package    Cfwjm

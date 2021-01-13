@@ -8,17 +8,17 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              https://devcrazy.com
+ * @link              https://devcrazygit.github.io/
  * @since             1.0.0
  * @package           Cfwjm
  *
  * @wordpress-plugin
- * Plugin Name:       Custom Field for WP Job Manager
- * Plugin URI:        https://devcrazy.com/cfwjm
+ * Plugin Name:       Custom Job Fields for WP Job Manager
+ * Plugin URI:        https://wordpress.org/plugins/custom-job-fields-for-wp-job-manager
  * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
  * Version:           1.0.0
  * Author:            Devcrazy
- * Author URI:        https://devcrazy.com
+ * Author URI:        https://devcrazygit.github.io/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       cfwjm
@@ -29,7 +29,7 @@
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
-session_start();			
+	
 /**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
