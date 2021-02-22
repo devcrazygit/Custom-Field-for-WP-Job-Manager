@@ -14,7 +14,7 @@
 ?>
 <div class="form-wrap">    
     <h2><?php echo esc_html__('Add Field', $this->plugin_name); ?></h2>
-    <?php echo $_SESSION['cfwjm_msg']; $_SESSION['cfwjm_msg'] = ''; ?>
+    
     <form method="POST" action="<?php echo esc_html( admin_url( 'admin-post.php' ) ); ?>">
         <?php
             wp_nonce_field( $action, $nounce_name );
