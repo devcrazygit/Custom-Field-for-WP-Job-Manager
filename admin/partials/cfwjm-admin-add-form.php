@@ -47,6 +47,7 @@
                 <option value="radio">Radio</option>
                 <option value="select">Select</option>
                 <option value="text">Text</option>
+                <option value="textarea">Text Area</option>
                 <option value="checkbox">Check Box</option>
                 <option value="tags">Tag Input</option>
                 <option value="checkbox_group">Check Box Group</option>
